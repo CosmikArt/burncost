@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "burncost"
+version = "0.0.1"
+description = "Burning cost analysis — loss trending, development factors, and premium on-leveling for P&C pricing."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Isaac López", email = "isaaclopg@gmail.com" },
+]
+keywords = [
+    "actuarial",
+    "insurance",
+    "burning-cost",
+    "loss-development",
+    "trending",
+    "on-leveling",
+    "chain-ladder",
+    "ratemaking",
+    "P&C",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/CosmikArt/burncost"
+Repository = "https://github.com/CosmikArt/burncost"
+Issues = "https://github.com/CosmikArt/burncost/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/burncost"]
