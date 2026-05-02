@@ -1,4 +1,4 @@
-"""Smoke tests — verify that the package imports and classes instantiate."""
+"""Smoke tests: verify that the package imports and classes instantiate."""
 
 import numpy as np
 import pytest

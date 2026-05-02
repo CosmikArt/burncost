@@ -15,7 +15,7 @@ def years():
 
 @pytest.fixture
 def exp_severity(years):
-    # y = 1000 * exp(0.05 * (t - 2018)) — clean exponential.
+    # y = 1000 * exp(0.05 * (t - 2018)); clean exponential.
     return 1_000.0 * np.exp(0.05 * (years - 2018))
 
 

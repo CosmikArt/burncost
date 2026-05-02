@@ -114,7 +114,7 @@ class TestParallelogram:
 
     def test_six_month_term(self):
         # With a 6-month term and a change a year before AY, the AY should be
-        # entirely at the new (current) level — OLF = 1.0.
+        # entirely at the new (current) level, so OLF = 1.0.
         df = pd.DataFrame(
             {
                 "effective_date": pd.to_datetime(["2023-01-01"]),

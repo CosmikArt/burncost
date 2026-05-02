@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "burncost"
-version = "0.0.1"
-description = "Burning cost analysis — loss trending, development factors, and premium on-leveling for P&C pricing."
+version = "0.1.0"
+description = "Burning cost analysis: loss trending, development factors, and premium on-leveling for P&C pricing."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
@@ -24,7 +24,7 @@ keywords = [
     "P&C",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Financial and Insurance Industry",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -41,6 +41,12 @@ dependencies = [
     "pandas>=2.0",
     "scipy>=1.10",
     "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
 ]
 
 [project.urls]

@@ -105,7 +105,7 @@ class TestTrendEdgeCases:
         years = np.arange(2018, 2026, dtype=float)
         sev = 1_000.0 * np.exp(0.05 * (years - 2018))
         trend = TrendEstimator().fit(years, sev, method="mixed")
-        # Just verify it returns something finite — exact value follows formula.
+        # Just verify it returns something finite. Exact value follows formula.
         assert np.isfinite(trend.annual_rate())
 
     def test_annual_rate_mixed_zero_mean_y(self):
@@ -140,7 +140,7 @@ class TestTrendEdgeCases:
 
 class TestDevelopmentEdgeCases:
     def test_link_ratio_returns_nan_when_no_valid_pairs(self):
-        # Two columns, but column 0 is all NaN — no valid (a, b) pairs.
+        # Two columns, but column 0 is all NaN, so no valid (a, b) pairs.
         data = np.array(
             [
                 [np.nan, 100.0],
@@ -194,7 +194,7 @@ class TestDevelopmentEdgeCases:
         assert tail >= 1.0
 
     def test_tail_factor_exponential_non_decaying(self):
-        # Selected factors that grow over time — slope >= 0; should refuse.
+        # Selected factors that grow over time (slope >= 0); should refuse.
         data = np.array(
             [
                 [100.0, 110.0, 130.0, 200.0],

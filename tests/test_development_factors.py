@@ -65,7 +65,7 @@ class TestAgeToAge:
         tri = LossTriangle(data, [2021, 2022, 2023, 2024], [12, 24, 36])
         dev = DevelopmentFactors.from_triangle(tri)
         df = dev.age_to_age(average="medial")
-        # 12-24 ratios: 1.1, 1.3, 2.0 — drop high (2.0) and low (1.1) => 1.3
+        # 12-24 ratios: 1.1, 1.3, 2.0; drop high (2.0) and low (1.1) => 1.3
         assert pytest.approx(df.loc["selected", "12-24"]) == 1.3
 
 

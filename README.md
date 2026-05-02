@@ -1,47 +1,14 @@
-[![PyPI version](https://img.shields.io/pypi/v/burncost?color=blue)](https://pypi.org/project/burncost/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status: Alpha](https://img.shields.io/badge/status-alpha-orange.svg)]()
+[![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)]()
 
 # burncost
 
-**Burning cost analysis — loss trending, development, and on-leveling for P&C pricing.**
-
----
-
-## What is burncost?
-
-Every pricing actuary knows the drill: before you can build a rate model you
-need *ratemaking-ready experience*. Raw loss data must be developed to ultimate,
-trended to future cost levels, and premiums must be on-leveled to a common rate
-basis. This data-preparation step is the backbone of every loss-ratio or
-pure-premium analysis, yet no focused Python library exists for it.
-
-**burncost** fills that gap. It provides a single, opinionated API for the three
-pillars of burning-cost analysis:
-
-1. **Loss trending** — fit and extrapolate frequency/severity trends using seven
-   well-known functional forms.
-2. **Loss development** — compute age-to-age and age-to-ultimate factors from
-   loss triangles via chain-ladder, Bornhuetter-Ferguson, and user-selected
-   factor methods.
-3. **Premium on-leveling** — bring historical premiums to current rate level
-   using the parallelogram method and a schedule of rate changes.
-
-The result is a clean, auditable pipeline that turns messy historical data into
-the inputs your ratemaking model expects.
+Python library for ratemaking-ready loss-experience preparation. Loss development (chain-ladder, Bornhuetter-Ferguson), trend estimation, and premium on-leveling via the parallelogram method. Designed to chain into a downstream rate model.
 
 ---
 
 ## Installation
-
-### From PyPI (when published)
-
-```bash
-pip install burncost
-```
-
-### From source
 
 ```bash
 git clone https://github.com/CosmikArt/burncost.git
@@ -54,6 +21,9 @@ pip install -e .
 ## Quickstart
 
 ```python
+import matplotlib
+matplotlib.use("Agg")  # headless-safe; remove if you want an interactive window
+
 import numpy as np
 import pandas as pd
 from burncost import (
@@ -110,18 +80,29 @@ bc = BurningCostAnalysis(
     on_level=onlevel,
 )
 # bc.run() will wire development -> trending -> on-leveling into one table.
+
+# --- 5. Diagnostics --------------------------------------------------------
+from burncost.diagnostics import trend_fit_summary, development_stability
+print(trend_fit_summary(trend))
+print(development_stability(dev))
 ```
 
 ---
 
-## Features
+## Modules
 
-| Module | Capabilities |
+The five top-level classes are re-exported from the package root, so
+`from burncost import X` works for all of them. Internally each concern
+lives in its own module.
+
+| Module | What's in it |
 |---|---|
-| `trending` | Exponential, linear, multiplicative, additive, power, log-linear, and mixed trend fits; annual/multi-year trend factors; extrapolation |
-| `development` | Age-to-age factors, weighted/simple/medial averages, chain-ladder ultimate, Bornhuetter-Ferguson, selected factors, tail-factor extrapolation |
-| `onlevel` | Premium on-leveling via parallelogram method, rate-change history ingestion, on-level factors by policy or accident year |
-| `diagnostics` | Trend-fit plots, development-factor stability charts, residual analysis, goodness-of-fit statistics |
+| `burncost.triangle` | `LossTriangle`: incremental/cumulative container with `to_cumulative`, `to_incremental`, `to_dataframe`, `latest_diagonal`. |
+| `burncost.development` | `DevelopmentFactors`: age-to-age factors (volume / simple / medial averaging), age-to-ultimate, chain-ladder, Bornhuetter-Ferguson, exponential tail extrapolation. |
+| `burncost.trending` | `TrendEstimator`: seven trend forms (exponential, linear, multiplicative, additive, power, log-linear, mixed); `predict`, `trend_factor`, `annual_rate`, `plot`. |
+| `burncost.onlevel` | `OnLevelPremium`: parallelogram-method on-leveling with rate-change ingestion, vectorised `on_level_factors`, per-year `on_level_factor`. |
+| `burncost.pipeline` | `BurningCostAnalysis`: end-to-end wiring of development, trending, and on-leveling into one output table. |
+| `burncost.diagnostics` | `trend_fit_summary`, `goodness_of_fit`, `trend_residual_plot`, `development_stability`, `development_factor_plot`, `chain_ladder_residuals` (Mack-style). |
 
 ---
 
