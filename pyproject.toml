@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "burncost"
-version = "0.1.0"
+version = "0.1.1"
 description = "Burning cost analysis: loss trending, development factors, and premium on-leveling for P&C pricing."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
-    { name = "Isaac López", email = "isaaclopg@gmail.com" },
+    { name = "Isaac López", email = "jisaaclopg@gmail.com" },
 ]
 keywords = [
     "actuarial",
