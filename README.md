@@ -1,3 +1,4 @@
+[![PyPI version](https://img.shields.io/pypi/v/burncost?color=blue)](https://pypi.org/project/burncost/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Status: Beta](https://img.shields.io/badge/status-beta-yellow.svg)]()
@@ -6,17 +7,19 @@
 
 Python library for ratemaking-ready loss-experience preparation. Loss development (chain-ladder, Bornhuetter-Ferguson), trend estimation, and premium on-leveling via the parallelogram method. Designed to chain into a downstream rate model.
 
----
-
 ## Installation
+
+```bash
+pip install burncost
+```
+
+From source:
 
 ```bash
 git clone https://github.com/CosmikArt/burncost.git
 cd burncost
-pip install -e .
+pip install -e ".[dev]"
 ```
-
----
 
 ## Quickstart
 
@@ -87,8 +90,6 @@ print(trend_fit_summary(trend))
 print(development_stability(dev))
 ```
 
----
-
 ## Modules
 
 The five top-level classes are re-exported from the package root, so
@@ -104,8 +105,6 @@ lives in its own module.
 | `burncost.pipeline` | `BurningCostAnalysis`: end-to-end wiring of development, trending, and on-leveling into one output table. |
 | `burncost.diagnostics` | `trend_fit_summary`, `goodness_of_fit`, `trend_residual_plot`, `development_stability`, `development_factor_plot`, `chain_ladder_residuals` (Mack-style). |
 
----
-
 ## References
 
 - **Werner, G. & Modlin, C.** *Basic Ratemaking*, CAS, Chapters 4-5 (trending and loss development).
@@ -113,16 +112,12 @@ lives in its own module.
 - **Bornhuetter, R. L. & Ferguson, R. E.** (1972). "The Actuary and IBNR." *Proceedings of the CAS*, LIX, 181-195.
 - **Friedland, J.** *Estimating Unpaid Claims Using Basic Techniques*. Casualty Actuarial Society.
 
----
-
 ## Contributing
 
-Contributions are welcome. Please open an issue to discuss proposed changes
-before submitting a pull request. All code must include type hints, docstrings,
-and unit tests.
-
----
+Run `pytest` before sending a PR.
 
 ## Author
 
-**Isaac López**
+Isaac López
+
+MIT License. See [LICENSE](LICENSE).
