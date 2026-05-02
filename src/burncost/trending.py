@@ -64,6 +64,11 @@ class TrendEstimator:
         self._params: dict[str, float] | None = None
         self._x: np.ndarray | None = None
         self._y: np.ndarray | None = None
+        # Mean of fit-time x. Used to evaluate centered-fit families
+        # (exponential, multiplicative, log_linear, mixed-exp side) at
+        # predict time. Default 0.0 keeps manually-injected estimators
+        # (without a fit() call) backward-compatible.
+        self._x_mean: float = 0.0
 
     # -- core API -----------------------------------------------------------
 
@@ -93,22 +98,36 @@ class TrendEstimator:
         self._x = x_arr
         self._y = y_arr
 
+        # Center x around its mean before polyfit. With raw calendar
+        # years the Vandermonde matrix can be ill-conditioned; centering
+        # is mathematically equivalent and numerically much better.
+        x_mean = float(x_arr.mean())
+        x_centered = x_arr - x_mean
+        self._x_mean = x_mean
+
         if method in ("exponential", "multiplicative", "log_linear"):
             if np.any(y_arr <= 0):
                 raise ValueError(
                     f"{method} trend requires strictly positive y values."
                 )
             ln_y = np.log(y_arr)
-            slope, intercept = np.polyfit(x_arr, ln_y, 1)
+            slope, intercept = np.polyfit(x_centered, ln_y, 1)
+            # Store centered-fit params; predict uses (x - x_mean).
             self._params = {"a": float(np.exp(intercept)), "b": float(slope)}
         elif method in ("linear", "additive"):
-            slope, intercept = np.polyfit(x_arr, y_arr, 1)
-            self._params = {"a": float(intercept), "b": float(slope)}
+            slope, intercept = np.polyfit(x_centered, y_arr, 1)
+            # Back-transform to original scale so params and predict
+            # behave identically to the pre-centering implementation.
+            #   y = a_c + b_c*(x - xm) = (a_c - b_c*xm) + b_c*x
+            a_orig = float(intercept) - float(slope) * x_mean
+            self._params = {"a": a_orig, "b": float(slope)}
         elif method == "power":
             if np.any(x_arr <= 0) or np.any(y_arr <= 0):
                 raise ValueError(
                     "power trend requires strictly positive x and y values."
                 )
+            # log(x) for typical inputs stays well-conditioned, so
+            # centering on log(x) buys nothing here.
             slope, intercept = np.polyfit(np.log(x_arr), np.log(y_arr), 1)
             self._params = {"a": float(np.exp(intercept)), "b": float(slope)}
         else:  # method == "mixed" (validated against _VALID_METHODS above)
@@ -117,12 +136,15 @@ class TrendEstimator:
                     "mixed trend requires strictly positive y values."
                 )
             ln_y = np.log(y_arr)
-            slope_e, int_e = np.polyfit(x_arr, ln_y, 1)
-            slope_l, int_l = np.polyfit(x_arr, y_arr, 1)
+            slope_e, int_e = np.polyfit(x_centered, ln_y, 1)
+            slope_l, int_l = np.polyfit(x_centered, y_arr, 1)
+            # Exp side stored centered (predict uses x - x_mean); linear
+            # side back-transformed so its (a, b) read on the original scale.
+            a_lin_orig = float(int_l) - float(slope_l) * x_mean
             self._params = {
                 "a_exp": float(np.exp(int_e)),
                 "b_exp": float(slope_e),
-                "a_lin": float(int_l),
+                "a_lin": a_lin_orig,
                 "b_lin": float(slope_l),
             }
         return self
@@ -132,15 +154,16 @@ class TrendEstimator:
         if self._method is None or self._params is None:
             raise RuntimeError("Call fit() before predict().")
         x_arr = np.asarray(x, dtype=float)
+        xm = self._x_mean
         p = self._params
         if self._method in ("exponential", "multiplicative", "log_linear"):
-            return p["a"] * np.exp(p["b"] * x_arr)
+            return p["a"] * np.exp(p["b"] * (x_arr - xm))
         if self._method in ("linear", "additive"):
             return p["a"] + p["b"] * x_arr
         if self._method == "power":
             return p["a"] * np.power(x_arr, p["b"])
         # mixed
-        exp_pred = p["a_exp"] * np.exp(p["b_exp"] * x_arr)
+        exp_pred = p["a_exp"] * np.exp(p["b_exp"] * (x_arr - xm))
         lin_pred = p["a_lin"] + p["b_lin"] * x_arr
         return 0.5 * (exp_pred + lin_pred)
 
@@ -149,8 +172,11 @@ class TrendEstimator:
         if self._method is None:
             raise RuntimeError("Call fit() before trend_factor().")
         pred = self.predict(np.array([from_year, to_year], dtype=float))
-        if pred[0] == 0:
-            raise ZeroDivisionError("Predicted base value is zero.")
+        if abs(pred[0]) < 1e-9:
+            raise ZeroDivisionError(
+                f"Predicted base value is too close to zero ({pred[0]:.2e}); "
+                f"trend factor is undefined."
+            )
         return float(pred[1] / pred[0])
 
     @property

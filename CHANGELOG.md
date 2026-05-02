@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.2] - 2026-05-02
+
+### Fixed
+
+- `TrendEstimator.fit` now centers x around its mean before
+  polyfit to avoid Vandermonde ill-conditioning when x are
+  calendar years.
+- `TrendEstimator.trend_factor` raises `ZeroDivisionError` when the
+  predicted base value is within 1e-9 of zero, rather than producing
+  an astronomical factor.
+
 ## [0.1.1] - 2026-05-02
 
 ### Fixed

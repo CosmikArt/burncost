@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "burncost"
-version = "0.1.1"
+version = "0.1.2"
 description = "Burning cost analysis: loss trending, development factors, and premium on-leveling for P&C pricing."
 readme = "README.md"
 license = "MIT"
